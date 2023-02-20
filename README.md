@@ -10,10 +10,14 @@ Usage:
 
 - build the VMS
 
-    $ vagrant up
+```
+$ vagrant up
+```
 
 - connect to a VM and run the test
 
-    $ vagrant ssh <debstable|debtesting>
-    vagrant$ cd /vagrant
-    vagrant$ ./gst-playbin-seek-test.py
+```
+$ vagrant ssh <debstable|debtesting>
+vagrant$ cd /vagrant
+vagrant$ ./gst-playbin-seek-test.py
+```

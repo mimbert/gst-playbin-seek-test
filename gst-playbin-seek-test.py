@@ -8,8 +8,6 @@ from gi.repository import GObject, Gst, Gtk, GLib
 if __name__ == '__main__':
     Gst.init(None)
     player = Gst.ElementFactory.make('playbin')
-    fakevideosink = Gst.ElementFactory.make('fakesink')
-    player.set_property("video-sink", fakevideosink)
     uri1 = pathlib.Path(os.path.abspath("./bass_drum.wav")).as_uri()
     uri2 = pathlib.Path(os.path.abspath("./bass_drum_reverb.wav")).as_uri()
     player.set_property('uri', uri2)

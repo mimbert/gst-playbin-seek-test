@@ -19,5 +19,5 @@ $ vagrant up
 ```
 $ vagrant ssh <debstable|debtesting>
 vagrant$ cd /vagrant
-vagrant$ ./gst-playbin-seek-test.py
+vagrant$ ./gst-playbin-seek-test.py bass_drum_reverb.wav
 ```

@@ -16,7 +16,7 @@ if __name__ == '__main__':
         player.set_state(Gst.State.PAUSED)
         player.seek(1.0,
                     Gst.Format.TIME,
-                    Gst.SeekFlags.FLUSH,
+                    Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
                     Gst.SeekType.SET, 0,
                     Gst.SeekType.NONE, 0)
         player.set_state(Gst.State.PLAYING)

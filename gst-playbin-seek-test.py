@@ -25,7 +25,7 @@ if __name__ == '__main__':
         while True:
             got_duration, duration = player.query_duration(Gst.Format.TIME)
             got_position, position = player.query_position(Gst.Format.TIME)
-            print(f"position={position} duration={duration}")
+            print(f"got_position={got_position} position={position} got_duration={got_duration} duration={duration}")
             if got_duration and got_position:
                 if position >= duration:
                     print(f"reached end")

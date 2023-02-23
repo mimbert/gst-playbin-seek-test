@@ -10,8 +10,9 @@ if __name__ == '__main__':
     player = Gst.ElementFactory.make('playbin')
     fakevideosink = Gst.ElementFactory.make('fakesink')
     player.set_property("video-sink", fakevideosink)
-    uri = pathlib.Path(os.path.abspath("./bd_heavy.wav")).as_uri()
-    player.set_property('uri', uri)
+    uri1 = pathlib.Path(os.path.abspath("./bass_drum.wav")).as_uri()
+    uri2 = pathlib.Path(os.path.abspath("./bass_drum_reverb.wav")).as_uri()
+    player.set_property('uri', uri2)
 
     while True:
         player.set_state(Gst.State.PAUSED)

@@ -5,6 +5,21 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst, Gtk, GLib
 
+BLOCKING_GET_STATE_TIMEOUT = 1000 * Gst.MSECOND
+
+def set_state_blocking(element, state):
+    print(f"set state blocking {state}")
+    r = element.set_state(state)
+    if r == Gst.StateChangeReturn.ASYNC:
+        retcode, state, pending_state = element.get_state(BLOCKING_GET_STATE_TIMEOUT)
+        if retcode == Gst.StateChangeReturn.FAILURE:
+            print(f"WARNING: gst async state change failure after timeout of {BLOCKING_GET_STATE_TIMEOUT / Gst.MSECOND}ms. retcode: {retcode}, state: {state}, pending_state: {pending_state}")
+        elif retcode == Gst.StateChangeReturn.ASYNC:
+            print(f"WARNING gst async state change still async after timeout of {BLOCKING_GET_STATE_TIMEOUT / Gst.MSECOND}ms. retcode: {retcode}, state: {state}, pending_state: {pending_state}")
+    retcode, state, pending_state = element.get_state(0)
+    print(f"set_state_blocking returns {retcode} {state} {pending_state}")
+    return retcode, state, pending_state
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='gstreamer playbin seek test')
     parser.add_argument('path', help='file to open with playbin')

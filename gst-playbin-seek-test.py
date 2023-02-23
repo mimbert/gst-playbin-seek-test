@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
-import gi, os.path, pathlib, time
+import gi, os.path, pathlib, time, argparse
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst, Gtk, GLib
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='gstreamer playbin seek test')
+    parser.add_argument('path', help='file to open with playbin')
+    args = parser.parse_args()
+
     Gst.init(None)
     player = Gst.ElementFactory.make('playbin')
-    uri1 = pathlib.Path(os.path.abspath("./bass_drum.wav")).as_uri()
-    uri2 = pathlib.Path(os.path.abspath("./bass_drum_reverb.wav")).as_uri()
-    player.set_property('uri', uri2)
+    uri = pathlib.Path(os.path.abspath(args.path)).as_uri()
+    player.set_property('uri', uri)
 
     while True:
         player.set_state(Gst.State.PAUSED)

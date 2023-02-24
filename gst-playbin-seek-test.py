@@ -29,6 +29,16 @@ def wait_state_stable(element):
             print(f"ok no more pending state changes")
             return retcode, state, pending_state
 
+def safe_seek(element, rate, format, flags, start_type, start, stop_type, stop):
+    while True:
+        retcode, state, pending_state = wait_state_stable(element)
+        if (state == Gst.State.PAUSED
+            or (state == Gst.State.PLAYING
+                and flags & Gst.SeekFlags.FLUSH)):
+            break
+    print(f"OK we can seek")
+    return element.seek(rate, format, flags, start_type, start, stop_type, stop)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='gstreamer playbin seek test')
     parser.add_argument('path', help='file to open with playbin')

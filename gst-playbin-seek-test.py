@@ -20,6 +20,15 @@ def set_state_blocking(element, state):
     print(f"set_state_blocking returns {retcode} {state} {pending_state}")
     return retcode, state, pending_state
 
+def wait_state_stable(element):
+    while True:
+        print(f"wait state of {element} stable")
+        retcode, state, pending_state = element.get_state(Gst.CLOCK_TIME_NONE)
+        print(f"retcode = {retcode}, state = {state}, pending_state = {pending_state}")
+        if retcode == Gst.StateChangeReturn.SUCCESS:
+            print(f"ok no more pending state changes")
+            return retcode, state, pending_state
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='gstreamer playbin seek test')
     parser.add_argument('path', help='file to open with playbin')

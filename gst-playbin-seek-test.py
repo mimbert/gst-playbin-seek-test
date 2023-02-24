@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import gi, os.path, pathlib, time, argparse
+import gi, os.path, pathlib, time, argparse, threading
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst, Gtk, GLib
@@ -39,13 +39,23 @@ def safe_seek(element, rate, format, flags, start_type, start, stop_type, stop):
     print(f"OK we can seek")
     return element.seek(rate, format, flags, start_type, start, stop_type, stop)
 
+def gst_bus_message_handler(bus, message, *user_data):
+    player = user_data[0]
+    print(f"gst_bus_message_handler message: {message.type.first_value_name}: {message.get_structure().to_string() if message.get_structure() else 'None'}")
+    if message.type == Gst.MessageType.WARNING:
+        print(f"WARNING: Gstreamer WARNING: {message.type}: {message.get_structure().to_string()}")
+    elif message.type == Gst.MessageType.ERROR:
+        print(f"WARNING: Gstreamer ERROR: {message.type}: {message.get_structure().to_string()}")
+    return True
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='gstreamer playbin seek test')
     parser.add_argument('path', help='file to open with playbin')
     args = parser.parse_args()
-
+    threading.Thread(target = lambda: GLib.MainLoop.new(None, False).run()).start()
     Gst.init(None)
     player = Gst.ElementFactory.make('playbin')
+    player.get_bus().add_watch(GLib.PRIORITY_DEFAULT, gst_bus_message_handler, player)
     uri = pathlib.Path(os.path.abspath(args.path)).as_uri()
     player.set_property('uri', uri)
 

@@ -60,6 +60,7 @@ if __name__ == '__main__':
     threading.Thread(daemon=True, target=lambda: GLib.MainLoop.new(None, False).run()).start()
     Gst.init(None)
     player = Gst.ElementFactory.make('playbin')
+    player.set_property('flags', player.get_property('flags') & ~(0x00000001 | 0x00000004 | 0x00000008)) # disable video, subtitles, visualisation
     if args.sink:
         params = args.sink.split('/')
         sinkname = params.pop(0)

@@ -76,4 +76,4 @@ if __name__ == '__main__':
                     print(f"reached end")
                     break
             time.sleep(0.1)
-        time.sleep(2) # wait 2 seconds before replaying the sound
+        time.sleep(1) # wait before replaying the sound

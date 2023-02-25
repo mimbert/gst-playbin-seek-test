@@ -7,6 +7,8 @@ from gi.repository import GObject, Gst, Gtk, GLib
 
 BLOCKING_GET_STATE_TIMEOUT = 1000 * Gst.MSECOND
 
+finished = threading.Event()
+
 def set_state_blocking(element, state):
     print(f"set state blocking {state}")
     r = element.set_state(state)
@@ -42,6 +44,8 @@ def safe_seek(element, rate, format, flags, start_type, start, stop_type, stop):
 def gst_bus_message_handler(bus, message, *user_data):
     player = user_data[0]
     print(f"gst_bus_message_handler message: {message.type.first_value_name}: {message.get_structure().to_string() if message.get_structure() else 'None'}")
+    if message.type in [ Gst.MessageType.EOS, Gst.MessageType.SEGMENT_DONE ]:
+        finished.set()
     if message.type == Gst.MessageType.WARNING:
         print(f"WARNING: Gstreamer WARNING: {message.type}: {message.get_structure().to_string()}")
     elif message.type == Gst.MessageType.ERROR:
@@ -73,8 +77,8 @@ if __name__ == '__main__':
     player.get_bus().add_watch(GLib.PRIORITY_DEFAULT, gst_bus_message_handler, player)
     uri = pathlib.Path(os.path.abspath(args.path)).as_uri()
     player.set_property('uri', uri)
-
     while True:
+        print("start")
         player.set_state(Gst.State.PAUSED)
         player.seek(1.0,
                     Gst.Format.TIME,
@@ -87,8 +91,9 @@ if __name__ == '__main__':
             got_position, position = player.query_position(Gst.Format.TIME)
             print(f"got_position={got_position} position={position} got_duration={got_duration} duration={duration}")
             if got_duration and got_position:
-                if position >= duration:
-                    print(f"reached end")
+                if position >= duration or finished.is_set():
+                    print("end")
                     break
             time.sleep(0.1)
+        finished.clear()
         time.sleep(1) # wait before replaying the sound

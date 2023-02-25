@@ -52,7 +52,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='gstreamer playbin seek test')
     parser.add_argument('path', help='file to open with playbin')
     args = parser.parse_args()
-    threading.Thread(target = lambda: GLib.MainLoop.new(None, False).run()).start()
+    threading.Thread(daemon=True, target=lambda: GLib.MainLoop.new(None, False).run()).start()
     Gst.init(None)
     player = Gst.ElementFactory.make('playbin')
     player.get_bus().add_watch(GLib.PRIORITY_DEFAULT, gst_bus_message_handler, player)

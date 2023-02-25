@@ -51,10 +51,25 @@ def gst_bus_message_handler(bus, message, *user_data):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='gstreamer playbin seek test')
     parser.add_argument('path', help='file to open with playbin')
+    parser.add_argument('--sink', type=str, help='select audio sink. List of properties can be given with the syntax --sink=sinkname[/property1=value1][/property2=value2...].')
     args = parser.parse_args()
     threading.Thread(daemon=True, target=lambda: GLib.MainLoop.new(None, False).run()).start()
     Gst.init(None)
     player = Gst.ElementFactory.make('playbin')
+    if args.sink:
+        params = args.sink.split('/')
+        sinkname = params.pop(0)
+        properties = {}
+        for p in params:
+            k, _, v = p.partition('=')
+            properties[k] = v
+        audiosink = Gst.ElementFactory.make(sinkname)
+        if not audiosink:
+            print(f"unable to instanciate {sinkname}")
+            exit(1)
+        for k in properties:
+            audiosink.set_property(k, properties[k])
+        player.set_property("audio-sink", audiosink)
     player.get_bus().add_watch(GLib.PRIORITY_DEFAULT, gst_bus_message_handler, player)
     uri = pathlib.Path(os.path.abspath(args.path)).as_uri()
     player.set_property('uri', uri)

@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+import gi, os.path, pathlib, time, argparse, threading, ipdb
+gi.require_version('Gtk', '3.0')
+gi.require_version('Gst', '1.0')
+from gi.repository import GObject, Gst, Gtk, GLib
+
+def iprint(indent, s):
+    print(' ' * indent + s)
+
+def show_plugin(p, i=0):
+    iprint(i, f"plugin {p.get_name()}")
+    iprint(i, f"  description  {p.get_description()}")
+    iprint(i, f"  version      {p.get_version()}")
+    iprint(i, f"  release date {p.get_release_date_string()}")
+    iprint(i, f"  filename     {p.get_filename()}")
+    iprint(i, f"  license      {p.get_license()}")
+    iprint(i, f"  origin       {p.get_origin()}")
+    iprint(i, f"  package      {p.get_package()}")
+    iprint(i, f"  source       {p.get_source()}")
+
+def show_factory(f, i=0):
+    f.load()
+    iprint(i, f"factory {f.name}")
+    iprint(i, f"  klass {f.get_klass()}")
+    iprint(i, f"  elements: {f.get_element_type()}")
+    t = f.get_element_type()
+    iprint(i, f"  metadata:")
+    metadata_keys = f.get_metadata_keys()
+    for k in metadata_keys:
+        metadata = f.get_metadata(k)
+        iprint(i, f"    {k}: {metadata}")
+    e = Gst.ElementFactory.make(f.name, None)
+    properties = e.list_properties()
+    iprint(i, f"  properties:")
+    for prop in properties:
+        iprint(i, f"    {prop.value_type.name:15}{prop.name:30}")
+    show_plugin(f.get_plugin(), 2)
+    
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='gstreamer inspect plugins and elements')
+    args = parser.parse_args()
+    Gst.init(None)
+    factories = Gst.Registry.get().get_feature_list(Gst.ElementFactory)
+    audio_sinks_factories = [ f for f in factories if ('Audio' in f.get_klass() and ('sink' in f.name or 'Sink' in f.get_klass())) ]
+    for f in audio_sinks_factories:
+        show_factory(f)

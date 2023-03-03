@@ -1,6 +1,6 @@
 # gst-playbin-seek-test
 
-Plays a sound with a fast attack with gstreamer playbin. Check
+Plays a sound with a fast attack, repeatedly, with gstreamer playbin. Check
 behavior in VMs debian bullseye with pulseaudio and debien testing
 with pipewire.
 
